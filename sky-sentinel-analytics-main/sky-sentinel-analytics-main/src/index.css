@@ -1,0 +1,333 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SkySentinel - Cyberpunk HUD Design System */
+
+@layer base {
+  :root {
+    /* Core Dark Terminal Background */
+    --background: 222 47% 7%;
+    --foreground: 210 40% 92%;
+
+    /* Cards with Glassmorphism */
+    --card: 217 32% 12%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 217 32% 14%;
+    --popover-foreground: 210 40% 96%;
+
+    /* Cyber Sky Blue Primary */
+    --primary: 199 89% 48%;
+    --primary-foreground: 222 47% 7%;
+
+    /* Slate Secondary */
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 210 40% 96%;
+
+    /* Muted Terminal */
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 55%;
+
+    /* Accent Glow */
+    --accent: 199 89% 48%;
+    --accent-foreground: 222 47% 7%;
+
+    /* Alert Colors */
+    --destructive: 350 89% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Status Colors */
+    --status-safe: 158 64% 52%;
+    --status-caution: 38 92% 50%;
+    --status-critical: 350 89% 60%;
+
+    /* Borders & Inputs */
+    --border: 217 32% 22%;
+    --input: 217 32% 18%;
+    --ring: 199 89% 48%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar */
+    --sidebar-background: 217 32% 10%;
+    --sidebar-foreground: 210 40% 92%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 222 47% 7%;
+    --sidebar-accent: 217 32% 20%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 217 32% 22%;
+    --sidebar-ring: 199 89% 48%;
+
+    /* Charts */
+    --chart-1: 199 89% 48%;
+    --chart-2: 158 64% 52%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 350 89% 60%;
+    --chart-5: 280 60% 60%;
+
+    /* Glows and Effects */
+    --glow-primary: 0 0 30px hsl(199 89% 48% / 0.4);
+    --glow-safe: 0 0 30px hsl(158 64% 52% / 0.5);
+    --glow-caution: 0 0 30px hsl(38 92% 50% / 0.5);
+    --glow-critical: 0 0 30px hsl(350 89% 60% / 0.6);
+
+    /* Fonts */
+    --font-display: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'Roboto Mono', ui-monospace, monospace;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .dark {
+    --background: 222 47% 5%;
+    --foreground: 210 40% 94%;
+    --card: 217 32% 10%;
+    --card-foreground: 210 40% 96%;
+    --popover: 217 32% 12%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 199 89% 52%;
+    --primary-foreground: 222 47% 7%;
+    --secondary: 215 28% 15%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 217 32% 15%;
+    --muted-foreground: 215 20% 60%;
+    --accent: 199 89% 52%;
+    --accent-foreground: 222 47% 7%;
+    --border: 217 32% 20%;
+    --input: 217 32% 15%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image: 
+      radial-gradient(ellipse at top, hsl(217 32% 12% / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, hsl(199 89% 20% / 0.1) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+}
+
+@layer components {
+  /* Glass Panel Effect */
+  .glass-panel {
+    @apply bg-card/70 backdrop-blur-xl border border-border/50 rounded-xl;
+    box-shadow: 
+      0 4px 30px hsl(0 0% 0% / 0.2),
+      inset 0 1px 0 hsl(210 40% 98% / 0.05);
+  }
+
+  .glass-panel-strong {
+    @apply bg-card/85 backdrop-blur-2xl border border-primary/20 rounded-xl;
+    box-shadow: 
+      0 8px 40px hsl(199 89% 48% / 0.15),
+      inset 0 1px 0 hsl(199 89% 48% / 0.1);
+  }
+
+  /* Cyber Header Text */
+  .cyber-title {
+    @apply font-display font-bold tracking-wider uppercase;
+    text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+  }
+
+  .cyber-subtitle {
+    @apply font-mono text-xs tracking-[0.2em] uppercase text-muted-foreground;
+  }
+
+  /* Status Badges */
+  .status-safe {
+    color: hsl(var(--status-safe));
+    text-shadow: var(--glow-safe);
+  }
+
+  .status-caution {
+    color: hsl(var(--status-caution));
+    text-shadow: var(--glow-caution);
+  }
+
+  .status-critical {
+    color: hsl(var(--status-critical));
+    text-shadow: var(--glow-critical);
+  }
+
+  /* HUD Slider Track */
+  .hud-slider {
+    @apply w-full h-2 rounded-full appearance-none cursor-pointer;
+    background: linear-gradient(90deg, 
+      hsl(var(--secondary)) 0%, 
+      hsl(var(--primary) / 0.3) 100%
+    );
+  }
+
+  .hud-slider::-webkit-slider-thumb {
+    @apply appearance-none w-5 h-5 rounded-full cursor-pointer;
+    background: hsl(var(--primary));
+    box-shadow: 0 0 15px hsl(var(--primary) / 0.8);
+  }
+
+  .hud-slider::-moz-range-thumb {
+    @apply w-5 h-5 rounded-full cursor-pointer border-0;
+    background: hsl(var(--primary));
+    box-shadow: 0 0 15px hsl(var(--primary) / 0.8);
+  }
+
+  /* Navigation Buttons */
+  .nav-button {
+    @apply px-4 py-2 font-display text-xs tracking-widest uppercase transition-all duration-300;
+    @apply border-b-2 border-transparent hover:border-primary/50 hover:text-primary;
+  }
+
+  .nav-button.active {
+    @apply border-primary text-primary bg-primary/5;
+  }
+
+  /* Data Bar Animation */
+  .data-bar {
+    @apply h-full rounded-full transition-all duration-700 ease-out;
+    box-shadow: 0 0 10px currentColor;
+  }
+
+  /* Gauge Ring */
+  .gauge-ring {
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s ease-out;
+  }
+
+  /* Scanline Effect */
+  .scanlines::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      hsl(0 0% 0% / 0.03) 2px,
+      hsl(0 0% 0% / 0.03) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* Grid Pattern */
+  .grid-pattern {
+    background-image: 
+      linear-gradient(hsl(var(--primary) / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--primary) / 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Leaflet Map Override */
+  .leaflet-container {
+    @apply rounded-xl;
+    background: hsl(var(--background)) !important;
+  }
+
+  .leaflet-tile-pane {
+    filter: saturate(0.3) brightness(0.4) contrast(1.2) hue-rotate(180deg);
+  }
+
+  .leaflet-popup-content-wrapper {
+    @apply bg-card border border-primary/30 text-foreground !important;
+    border-radius: var(--radius) !important;
+  }
+
+  .leaflet-popup-tip {
+    background: hsl(var(--card)) !important;
+  }
+}
+
+@layer utilities {
+  /* Pulse Animation for Critical Status */
+  @keyframes pulse-critical {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .animate-pulse-critical {
+    animation: pulse-critical 1.5s ease-in-out infinite;
+  }
+
+  /* Glow Pulse */
+  @keyframes glow-pulse {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.3); 
+    }
+    50% { 
+      box-shadow: 0 0 40px hsl(var(--primary) / 0.6); 
+    }
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  /* Fade In Up */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+
+  /* Scan Line */
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  .animate-scan {
+    animation: scan 3s linear infinite;
+  }
+
+  /* Typing Effect */
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  .animate-cursor-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  /* Number Counter */
+  @keyframes count-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-count-up {
+    animation: count-up 0.3s ease-out;
+  }
+}
