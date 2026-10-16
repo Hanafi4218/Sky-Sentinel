@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkySentinel: MET Malaysia Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap');
+        body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: #e2e8f0; overflow-x: hidden; margin: 0; }
+        h1, h2, h3, .tech-font { font-family: 'Orbitron', sans-serif; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: 12px; }
+        .nav-btn { padding: 0.5rem 1rem; border-bottom: 2px solid transparent; transition: all 0.3s; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; }
+        .nav-btn.active { border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.05); }
+        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2338bdf8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem; }
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #38bdf8; cursor: pointer; margin-top: -7px; box-shadow: 0 0 8px #38bdf8; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #475569; border-radius: 2px; }
+        .status-safe { color: #4ade80; text-shadow: 0 0 10px #4ade80; }
+        .status-caution { color: #facc15; text-shadow: 0 0 10px #facc15; }
+        .status-critical { color: #f87171; text-shadow: 0 0 15px #f87171; }
+        .rule-active { color: #facc15; font-weight: bold; }
+        .rule-inactive { color: #64748b; }
+        @keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .warning-pulse { animation: pulse-red 2s infinite; }
+        .data-bar { transition: width 1s ease-out; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="w-full border-b border-slate-800 bg-slate-900/50 backdrop-blur-md p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-sky-500 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl text-sky-400 font-bold tracking-wider uppercase">SKY<span class="text-white">SENTINEL</span></h1>
+                    <p class="text-[10px] text-slate-500 font-mono uppercase">Live MET Sync Terminal</p>
+                </div>
+            </div>
+            <nav class="flex gap-2">
+                <div onclick="switchPage('engine')" id="nav-engine" class="nav-btn active">Fuzzy Engine</div>
+                <div onclick="switchPage('met')" id="nav-met" class="nav-btn">Live MET Data</div>
+                <div onclick="switchPage('about')" id="nav-about" class="nav-btn">System Docs</div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full">
+        <!-- PAGE 1: FUZZY ENGINE (Omitted for brevity, kept structure same as previous) -->
+        <div id="page-engine" class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fadeIn">
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <div class="glass-panel p-6">
+                    <h2 class="text-sm text-sky-300 mb-6 uppercase tracking-widest border-b border-slate-700 pb-2">Manual Control</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2"><label class="text-xs text-slate-400 uppercase">Wind Speed</label><span id="val-wind" class="font-mono text-sky-400">10 km/h</span></div>
+                            <input type="range" id="input-wind" min="0" max="100" value="10" class="w-full">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2"><label class="text-xs text-slate-400 uppercase">Humidity</label><span id="val-hum" class="font-mono text-blue-400">40 %</span></div>
+                            <input type="range" id="input-hum" min="0" max="100" value="40" class="w-full">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2"><label class="text-xs text-slate-400 uppercase">Temperature</label><span id="val-temp" class="font-mono text-orange-400">25 °C</span></div>
+                            <input type="range" id="input-temp" min="0" max="50" value="25" class="w-full">
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-panel p-6 flex-grow">
+                    <h2 class="text-sm text-sky-300 mb-4 uppercase tracking-widest border-b border-slate-700 pb-2">Membership Visualization</h2>
+                    <div class="space-y-4">
+                        <div><p class="text-[10px] text-slate-500 mb-1 uppercase">Wind</p><canvas id="canvas-wind" width="300" height="60" class="w-full h-14 bg-slate-900 rounded border border-slate-800"></canvas></div>
+                        <div><p class="text-[10px] text-slate-500 mb-1 uppercase">Humidity</p><canvas id="canvas-hum" width="300" height="60" class="w-full h-14 bg-slate-900 rounded border border-slate-800"></canvas></div>
+                        <div><p class="text-[10px] text-slate-500 mb-1 uppercase">Temp</p><canvas id="canvas-temp" width="300" height="60" class="w-full h-14 bg-slate-900 rounded border border-slate-800"></canvas></div>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <div class="glass-panel p-6 text-center">
+                    <h2 class="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Fuzzy Risk Assessment</h2>
+                    <div id="output-text" class="text-3xl font-bold tech-font status-safe mb-1">SAFE</div>
+                    <div class="text-4xl font-mono text-white"><span id="output-percent">0</span>%</div>
+                </div>
+                <div class="glass-panel p-6 flex-grow overflow-y-auto max-h-[500px]">
+                    <h3 class="text-xs text-sky-300 uppercase mb-4 border-b border-slate-700 pb-2">Logic Rules</h3>
+                    <div id="rule-list" class="space-y-2 font-mono text-[10px]"></div>
+                </div>
+            </div>
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <div class="glass-panel p-1 h-full relative overflow-hidden flex flex-col min-h-[400px]">
+                    <canvas id="sim-canvas" class="w-full h-full bg-slate-950 rounded-lg"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: MET MALAYSIA LIVE DATA -->
+        <div id="page-met" class="hidden animate-fadeIn space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="glass-panel p-6 col-span-1">
+                    <h2 class="text-lg text-sky-400 mb-4 uppercase tracking-widest">MET Control</h2>
+                    <div class="mb-6">
+                        <label class="text-[10px] text-slate-500 uppercase mb-2 block tracking-widest font-bold">Select Active Station</label>
+                        <select id="location-select" class="w-full bg-slate-900 border border-slate-700 text-sky-300 text-sm rounded-lg p-3 outline-none focus:border-sky-500 transition-colors">
+                            <option value="235400" selected>Putrajaya (W.P.)</option>
+                            <option value="48647">Kuala Lumpur (Subang)</option>
+                            <option value="229893">Penang (Bayan Lepas)</option>
+                            <option value="228029">Johor Bahru (Senai)</option>
+                            <option value="230204">Kuching (Sarawak)</option>
+                            <option value="229992">Kota Kinabalu (Sabah)</option>
+                        </select>
+                    </div>
+                    <button onclick="fetchMetData()" id="fetch-btn" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
+                        <svg id="loading-spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span>FETCH LIVE DATA</span>
+                    </button>
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center justify-between text-xs"><span class="text-slate-500">API Status:</span><span id="api-status-badge" class="text-emerald-400">READY</span></div>
+                        <div class="flex items-center justify-between text-xs"><span class="text-slate-500">Last Sync:</span><span id="last-sync" class="text-slate-300">Never</span></div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass-panel p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-sm text-slate-500 uppercase mb-4 border-b border-slate-800 pb-2">Forecast (Official)</h3>
+                                <div id="met-forecast-container" class="text-slate-300 font-mono space-y-4"><p class="text-slate-600 italic">Standby for data...</p></div>
+                            </div>
+                            <div class="md:border-l md:border-slate-800 md:pl-8">
+                                <h3 class="text-sm text-slate-500 uppercase mb-4 border-b border-slate-800 pb-2">Live Sensors</h3>
+                                <div id="sensor-stream" class="space-y-4 opacity-30 grayscale transition-all duration-700">
+                                    <div><div class="flex justify-between text-[10px] mb-1"><span class="text-sky-400 uppercase">Wind Speed</span><span id="live-wind-val" class="text-white">--</span></div><div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="live-wind-bar" class="data-bar h-full bg-sky-500" style="width: 0%"></div></div></div>
+                                    <div><div class="flex justify-between text-[10px] mb-1"><span class="text-blue-400 uppercase">Humidity</span><span id="live-hum-val" class="text-white">--</span></div><div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="live-hum-bar" class="data-bar h-full bg-blue-500" style="width: 0%"></div></div></div>
+                                    <div><div class="flex justify-between text-[10px] mb-1"><span class="text-orange-400 uppercase">Temp</span><span id="live-temp-val" class="text-white">--</span></div><div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800"><div id="live-temp-bar" class="data-bar h-full bg-orange-500" style="width: 0%"></div></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8 pt-8 border-t border-slate-800" id="cross-analysis">
+                            <p class="text-slate-600 text-center italic text-sm">Synchronize to activate SkySentinel AI comparative engine.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: ABOUT -->
+        <div id="page-about" class="hidden animate-fadeIn glass-panel p-8 max-w-4xl mx-auto">
+            <h2 class="text-2xl text-sky-400 mb-6 uppercase tracking-widest">System Documentation</h2>
+            <div class="prose prose-invert max-w-none text-slate-300 text-sm space-y-4">
+                <p>SkySentinel utilizes the Gemini 2.5 Flash model as a proxy bridge to fetch real-time observational data from the MET Malaysia public portal. This bypasses typical CORS restrictions while providing AI-summarized insights.</p>
+                <p class="text-red-400 font-bold uppercase text-[10px]">Note: Ensure your Gemini API Key is valid if running locally.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center p-6 border-t border-slate-800 bg-slate-900/50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-600 uppercase tracking-[0.2em]">
+            <span>SkySentinel Term v2.1</span>
+            <span id="footer-time">00:00:00 UTC+8</span>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
